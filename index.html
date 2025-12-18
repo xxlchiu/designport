@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Desktop Files Portfolio (Draggable)</title>
+<style>
+  :root{
+    --bg:#ffffff;
+    --fg:#000000;
+    --muted:#6c7f6f;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--fg);
+    font:14px/1.4 system-ui,-apple-system,Helvetica,Arial;
+    overflow:hidden;
+  }
+
+  /* top bar */
+  .top{
+    position:fixed;
+    inset:16px 18px auto 18px;
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    z-index:100;
+    pointer-events:none;
+  }
+  .brand{
+    pointer-events:auto;
+    font-size:14px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+  }
+  .filters{
+    pointer-events:auto;
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    justify-content:flex-end;
+  }
+  .btn{
+    padding:6px 10px;
+    border-radius:999px;
+    border:1px solid rgba(255,255,255,.12);
+    background:rgba(255,255,255,.04);
+    font-size:11px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    cursor:pointer;
+    transition:.15s ease;
+    user-select:none;
+  }
+  .btn:hover{ transform:translateY(-1px); }
+  .btn.active{
+    background:rgba(255,255,255,.14);
+    border-color:rgba(255,255,255,.28);
+  }
+
+  /* desktop */
+  .desktop{
+    position:fixed;
+    inset:0;
+    padding-top:72px;
+    overflow:hidden;
+  }
+
+  /* draggable “file” */
+  .file{
+    position:absolute;
+    width:120px;
+    height:120px;
+    border-radius:12px;
+    overflow:hidden;
+    background:#151515;
+    box-shadow:
+      0 14px 34px rgba(0,0,0,.40),
+      0 0 0 1px rgba(255,255,255,.05);
+    cursor:grab;
+    touch-action:none; /* important for touch dragging */
+    transition:
+      transform .18s ease,
+      opacity .18s ease,
+      filter .18s ease,
+      box-shadow .18s ease;
+  }
+  .file:active{ cursor:grabbing; }
+
+  .file img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+    user-select:none;
+    -webkit-user-drag:none;
+  }
+
+  .file:hover{
+    transform: translateY(-6px) scale(1.05) rotate(0deg) !important;
+    z-index:10;
+    box-shadow:
+      0 26px 70px rgba(0,0,0,.60),
+      0 0 0 1px rgba(255,255,255,.12);
+  }
+
+  /* while dragging: don't animate */
+  .dragging{
+    transition:none !important;
+    transform:none !important;
+    filter:none !important;
+    opacity:1 !important;
+    z-index:999 !important;
+  }
+
+  /* filtered-out */
+  .hidden{
+    opacity:.08;
+    filter:blur(2px);
+    pointer-events:none;
+  }
+
+  .hint{
+    position:fixed;
+    left:18px;
+    bottom:16px;
+    font-size:11px;
+    letter-spacing:.08em;
+    color:var(--muted);
+    z-index:100;
+  }
+
+  @media (max-width: 900px){
+    .file{ width:120px; height:165px; border-radius:10px; }
+  }
+</style>
+</head>
+
+<body>
+
+<div class="top">
+  <div class="brand">Siyi Zhao</div>
+  <div class="filters">
+    <div class="btn active" data-cat="All">All</div>
+    <div class="btn" data-cat="Brand">Brand</div>
+    <div class="btn" data-cat="Typography">Type</div>
+    <div class="btn" data-cat="Motion">Motion</div>
+    <div class="btn" data-cat="Illustration">Illustration</div>
+    <div class="btn" data-cat="Albums">Albums</div>
+  </div>
+</div>
+
+<div class="desktop" id="desktop">
+
+  <!-- Add a unique data-id for saving positions -->
+  <a class="file" data-id="wts" data-cat="Brand" href="#"
+     style="left:90px;top:110px;transform:rotate(-1deg)">
+    <img src="https://picsum.photos/id/1039/600/900" alt="">
+  </a>
+
+  <a class="file" data-id="ui" data-cat="Brand" href="#"
+     style="left:260px;top:160px;transform:rotate(1deg)">
+    <img src="https://picsum.photos/id/1050/600/900" alt="">
+  </a>
+
+  <a class="file" data-id="osteo" data-cat="Typography" href="#"
+     style="left:560px;top:160px;transform:rotate(2deg)">
+    <img src="https://picsum.photos/id/1062/600/900" alt="">
+  </a>
+
+  <a class="file" data-id="motion1" data-cat="Motion" href="#"
+     style="left:150px;top:360px;transform:rotate(1deg)">
+    <img src="https://picsum.photos/id/1025/600/900" alt="">
+  </a>
+
+  <a class="file" data-id="illu1" data-cat="Illustration" href="#"
+     style="left:720px;top:420px;transform:rotate(-2deg)">
+    <img src="https://picsum.photos/id/1011/600/900" alt="">
+  </a>
+
+  <a class="file" data-id="alb1" data-cat="Albums" href="#"
+     style="left:2000px;top:1200px;px;transform:rotate(-5deg)">
+    <img src="https://picsum.photos/id/1043/600/900" alt="">
+  </a>
+
+      <a class="file" data-id="osteo" data-cat="Typography" href="#"
+     style="left:560px;top:160px;">
+    <img src="https://picsum.photos/id/1062/600/900" alt="">
+  </a>
+
+      <a class="file" data-id="osteo" data-cat="Typography" href="#"
+     style="left:560px;top:2800px;transform:rotate(12deg)">
+    <img src="https://picsum.photos/id/1062/600/900" alt="">
+  </a>
+
+  <a class="file" data-id="osteo" data-cat="Typography" href="#"
+    <img src="https://picsum.photos/id/1062/600/900" alt="">
+  </a>
+  
+  </a>
+
+</div>
+
+<div class="hint">Drag thumbnails · Click to open · Filter to sort</div>
+
+<script>
+  // 1) Grab elements
+  const buttons = document.querySelectorAll(".btn");
+  const files = document.querySelectorAll(".file");
+
+  if (!buttons.length) console.warn("No .btn found — check your filter buttons class");
+  if (!files.length) console.warn("No .file found — check your thumbnails class");
+
+  // 2) FILTERING
+  function applyFilter(cat) {
+    files.forEach(f => {
+      const match = (cat === "All") || (f.dataset.cat === cat);
+      f.classList.toggle("hidden", !match);
+    });
+  }
+
+  buttons.forEach(btn => {
+    btn.addEventListener("click", () => {
+      buttons.forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      applyFilter(btn.dataset.cat);
+    });
+  });
+
+  // default filter = All (in case HTML forgot .active)
+  applyFilter(document.querySelector(".btn.active")?.dataset.cat || "All");
+
+  // 3) DRAGGING (single-click drag, free movement)
+  const key = "desktop_positions_free_v2";
+  const saved = JSON.parse(localStorage.getItem(key) || "{}");
+
+  files.forEach(el => {
+    // restore position
+    const id = el.dataset.id;
+    if (id && saved[id]) {
+      el.style.left = saved[id].x + "px";
+      el.style.top  = saved[id].y + "px";
+    }
+
+    // prevent native image drag ghost + link drag weirdness
+    el.addEventListener("dragstart", e => e.preventDefault());
+  });
+
+  function savePos(el){
+    const id = el.dataset.id;
+    if (!id) return;
+    const cur = JSON.parse(localStorage.getItem(key) || "{}");
+    cur[id] = {
+      x: parseFloat(el.style.left || "0"),
+      y: parseFloat(el.style.top  || "0")
+    };
+    localStorage.setItem(key, JSON.stringify(cur));
+  }
+
+  let zTop = 1000;
+  const DRAG_THRESHOLD = 5;
+
+  files.forEach(el => {
+    let startX = 0, startY = 0;
+    let baseLeft = 0, baseTop = 0;
+    let pointerId = null;
+    let dragging = false;
+    let moved = false;
+
+    el.addEventListener("pointerdown", (e) => {
+      // If currently filtered-out, ignore
+      if (el.classList.contains("hidden")) return;
+
+      // KEY: prevent default so first click works (no “double click to drag”)
+      e.preventDefault();
+      e.stopPropagation();
+
+      if (e.button !== undefined && e.button !== 0) return;
+
+      pointerId = e.pointerId;
+      startX = e.clientX;
+      startY = e.clientY;
+
+      baseLeft = parseFloat(el.style.left || "0");
+      baseTop  = parseFloat(el.style.top  || "0");
+
+      dragging = false;
+      moved = false;
+
+      el.style.zIndex = (++zTop).toString();
+      el.setPointerCapture(pointerId);
+    });
+
+    el.addEventListener("pointermove", (e) => {
+      if (pointerId !== e.pointerId) return;
+
+      const dx = e.clientX - startX;
+      const dy = e.clientY - startY;
+
+      if (!dragging) {
+        if (Math.hypot(dx, dy) < DRAG_THRESHOLD) return;
+        dragging = true;
+        moved = true;
+        el.classList.add("dragging");
+      }
+
+      el.style.left = (baseLeft + dx) + "px";
+      el.style.top  = (baseTop  + dy) + "px";
+    });
+
+    const end = () => {
+      if (!pointerId) return;
+
+      if (dragging) {
+        el.classList.remove("dragging");
+        savePos(el);
+      }
+
+      pointerId = null;
+      dragging = false;
+    };
+
+    el.addEventListener("pointerup", end);
+    el.addEventListener("pointercancel", end);
+
+    // allow click ONLY if not dragged
+    el.addEventListener("click", (e) => {
+      if (moved) {
+        e.preventDefault();
+        e.stopPropagation();
+        moved = false;
+      }
+    });
+  });
+</script>
+
+
+
+
+
+
+</body>
+</html>
